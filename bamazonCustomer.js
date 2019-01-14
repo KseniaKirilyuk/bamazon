@@ -1,20 +1,12 @@
-//Running this application will first display all of the items available for sale. 
-//Include the ids, names, and prices of products for sale.
-
-//The first should ask them the ID of the product they would like to buy.
-
-//The second message should ask how many units of the product they would like to buy.
-
-
 var mysql = require("mysql");
-var inquier=require("inquirer");
+var inquirer = require("inquirer");
 
 
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "root",
   database: "bamazon"
 });
 
@@ -25,42 +17,42 @@ connection.connect(function(err) {
 });
 
 function start() {
-connection.query("SELECT * FROM products", function(err, results) {
-	if (err) throw err;
+connection.query("SELECT * FROM products", function(err, res) {
+  if (err) throw err;
 
-  inquirer
+  console.table(res);
+
+   inquirer
     .prompt([
     	{
      	 name: "productId",
      	 type: "input",
-     	 message: "Give me the ID-number of the product you would like to buy"
-    	},
-    	{
+     	 message: "Give me the ID-number of the product you would like to buy?"
+      },
+      {
     	 name:"unitQuant",
     	 type:"input",
-    	 message: "How many items of the product would you like to buy"
+    	 message: "How many items of the product would you like to buy?"
    		}
     ])
      .then(function(answer) {
-     	var chosenItem;
-        for (var i = 0; i < results.length; i++) {
-          if (results[i].id === answer.productId) {
-            chosenItem = results[i];
-          }
-        }  
-        if (answer.unitQuant.parseInt() <= chosenItem.stock_quantity){
-        	var remainder=chosenItem.stock_quantity - answer.unitQuant.parseInt();
-        	chosenItem.stock_quantity =remainder;
-        	//change Mysql number???HOOOOW
-        	var totalPrice = answer.unitQuant.parseInt() * chosenItem.price;
-        	console.log("totalPrice: "+totalPrice);
+       var chosenId;
+       for (var i = 0; i < res.length; i++){
+        if(res[i].id == answer.productId){
+          chosenId=res[i];
+          nameofId=res[i].product_name;
+          console.log("id is "+chosenId.id+", product name is "+ nameofId);
         }
-        else{
-        	console.log("Insufficient quantity!");
-        	//then prevent the order from going through HOOOOW???
-        }
-
+       };  
+       if(chosenId.stock_quantity >= answer.unitQuant){
+        var totalSum= answer.unitQuant*chosenId.price;
+        console.log("total cost for " + answer.unitQuant + " of " +nameofId+" is "+totalSum)
+       }
+       else{console.log("Insufficient quantity!"); start()};
      })
-});
-
-
+    })
+    endConnection()
+  };
+  function endConnection(){
+      connection.end();
+  };
