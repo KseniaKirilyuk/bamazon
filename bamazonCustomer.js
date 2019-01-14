@@ -27,7 +27,7 @@ connection.query("SELECT * FROM products", function(err, res) {
     	{
      	 name: "productId",
      	 type: "input",
-     	 message: "Give me the ID-number of the product you would like to buy?"
+     	 message: "Choose the ID-number of the product you would like to buy?"
       },
       {
     	 name:"unitQuant",
